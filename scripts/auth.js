@@ -15,9 +15,13 @@ auth.onAuthStateChanged(user =>{
     console.log(user);
     if(user){
         // get data
+        user.getIdTokenResult().then(idTokenResult => {
+            user.admin = idTokenResult.claims.admin;
+            setupUI(user);
+        })
         db.collection('guides').onSnapshot(snapshot =>{
             setupGuides(snapshot.docs);
-            setupUI(user);
+            
         }, err =>{
             console.log(err);
         });
@@ -60,6 +64,9 @@ signupForm.addEventListener('submit', (e)=>{
         const modal = document.querySelector('#modal-signup');
         M.Modal.getInstance(modal).close();
         signupForm.reset();
+        signupForm.querySelector('.error').innerHTML = '';
+    }).catch(error =>{
+        signupForm.querySelector('.error').innerHTML = error.message;
     })
 });
 
@@ -86,5 +93,8 @@ loginForm.addEventListener('submit', (e)=>{
         const modal = document.querySelector('#modal-login');
         M.Modal.getInstance(modal).close();
         loginForm.reset();
+        loginForm.querySelector('.error').innerHTML = '';
+    }).catch(error =>{
+        loginForm.querySelector('.error').innerHTML = error.message;
     })
 })
